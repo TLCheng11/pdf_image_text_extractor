@@ -6,13 +6,17 @@ from PIL import Image
 # Path to the Tesseract executable (update this if necessary)
 pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract.exe'
 
-def extract_text_from_image(image, language=""):
+languages = {
+    "English": "eng",
+    "Chinese Simplified": "chi_sim",
+    "Chinese Traditional": "chi_tra",
+}
+
+def extract_text_from_image(image, language):
     # determine which language package to be used for OCR
     lang = "eng"
-    if language == "simplified chinese":
-        lang = "chi_sim"
-    elif language == "traditional chinese":
-        lang = "chi_tra"
+    if language in languages:
+        lang = languages[language]
 
     try:
         # Use pytesseract to extract text from the image
