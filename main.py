@@ -10,10 +10,12 @@ if __name__ == "__main__":
 
     language = st.selectbox(label="Please select the language you want to extract", options=["Chinese Simplified", "Chinese Traditional", "English"])
 
+    fix = st.checkbox("Fix image orientation", value=True)
+
     if file is not None:
         # Pass the file as BytesIO stream
         pdf_data = io.BytesIO(file.read())
-        images = op.parse_file(pdf_data)
+        images = op.parse_file(pdf_data, fix)
 
         # Display images in a loop
         for i, img in enumerate(images):

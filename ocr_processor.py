@@ -26,7 +26,7 @@ def extract_text_from_image(image, language):
         print(f"An error occurred: {e}")
         return None
 
-def parse_file(file):
+def parse_file(file, fix=True):
     doc = fitz.open(stream=file, filetype="pdf")
     images = []
 
@@ -36,19 +36,11 @@ def parse_file(file):
 
         image = Image.frombytes("RGB", [image_list.width, image_list.height], image_list.samples)
         
-        fixed_image = ih.deskew(image)
-
-        images.append(fixed_image)
+        if fix:
+            fixed_image = ih.deskew(image)
+            images.append(fixed_image)
+        else:
+            images.append(image)
 
     doc.close()
     return images
-
-def ocr_image(image):
-    extracted_text = extract_text_from_image(fixed_image)
-    
-    # if extracted_text:
-    #     print(f"Extracted text from page {page_num + 1}:\n{extracted_text}\n")
-    # else:
-    #     print(f"Text extraction failed for page {page_num + 1}.\n")
-
-    return extracted_text
