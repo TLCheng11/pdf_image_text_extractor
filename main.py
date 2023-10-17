@@ -45,7 +45,7 @@ if __name__ == "__main__":
             # Display images in a loop
             for i, img in enumerate(images):
                 st.subheader(f"Page {i + 1}")
-                np_img = ih.numpify_image(img)
+                image_np = ih.numpify_image(img)
 
                 col1, col2 = st.columns(2)
                 col1.image(img, use_column_width=True)
@@ -54,7 +54,7 @@ if __name__ == "__main__":
                 else:
                     col2.empty()
                 if pdf_extract_btn_clicked:
-                    text = op.extract_text_from_image(np_img, language=language)
+                    text = op.extract_text_from_image(image_np, language=language)
                     col2.text_area("Text", text, height=400)
                     data[i] = text
 
@@ -69,12 +69,13 @@ if __name__ == "__main__":
         img_extract_btn_clicked = st.button(label="Extract Text from Image")
 
         if image_file is not None:
-            np_img = ih.numpify_image(image_file)
+            img = ih.decode_img(image_file)
+            processed_img = ih.deskew(img)
             col1, col2 = st.columns(2)
-            col1.image(image_file, use_column_width=True)
+            col1.image(processed_img, use_column_width=True)
 
             if img_extract_btn_clicked:
-                text = op.extract_text_from_image()
+                text = op.extract_text_from_image(processed_img)
 
     # tab for translation
     with tab3:

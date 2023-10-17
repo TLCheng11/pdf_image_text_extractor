@@ -1,6 +1,16 @@
 import numpy as np
 import cv2
 
+def decode_img(image_file):
+    # Read the image as bytes
+    image_bytes = image_file.read()
+    # Convert the image bytes to a numpy array
+    image_np = np.frombuffer(image_bytes, np.uint8)
+    # Decode the image using OpenCV
+    img = cv2.imdecode(image_np, cv2.IMREAD_COLOR)
+    
+    return img
+
 def getSkewAngle(cvImage) -> float:
     # Prep image, copy, convert to gray scale, blur, and threshold
     newImage = cvImage.copy()
