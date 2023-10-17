@@ -31,7 +31,7 @@ if __name__ == "__main__":
 
         pdf_file = st.file_uploader(label="Upload your PDF file here.", type=['pdf'])
 
-        language = st.selectbox(label="Please select the language you want to extract", options=["Chinese Simplified", "Chinese Traditional", "English"])
+        pdf_language = st.selectbox(label="Please select the language you want to extract", key="language_option_1", options=["Chinese Simplified", "Chinese Traditional", "English"])
 
         fix = st.checkbox("Fix image orientation", value=True)
 
@@ -54,7 +54,7 @@ if __name__ == "__main__":
                 else:
                     col2.empty()
                 if pdf_extract_btn_clicked:
-                    text = op.extract_text_from_image(image_np, language=language)
+                    text = op.extract_text_from_image(image_np, language=pdf_language)
                     col2.text_area("Text", text, height=400)
                     data[i] = text
 
@@ -66,6 +66,8 @@ if __name__ == "__main__":
 
         image_file = st.file_uploader(label="Upload your image here.", type=['jpg', 'jpeg', 'png'])
 
+        img_language = st.selectbox(label="Please select the language you want to extract", key="language_option_2", options=["Chinese Simplified", "Chinese Traditional", "English"])
+
         img_extract_btn_clicked = st.button(label="Extract Text from Image")
 
         if image_file is not None:
@@ -75,7 +77,8 @@ if __name__ == "__main__":
             col1.image(processed_img, use_column_width=True)
 
             if img_extract_btn_clicked:
-                text = op.extract_text_from_image(processed_img)
+                text = op.extract_text_from_image(processed_img, language=img_language)
+                col2.text_area("Text", text, height=400)
 
     # tab for translation
     with tab3:
