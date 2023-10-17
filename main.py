@@ -4,7 +4,10 @@ import ocr_processor as op
 import image_helper as ih
 
 if __name__ == "__main__":
-    st.title("PDF text extractor demo")
+    st.set_page_config(page_title="PDF Text Extractor")
+    st.markdown('<link rel="stylesheet" type="text/css" href="/static/custom.css">', unsafe_allow_html=True)
+
+    st.title("PDF Text Extractor")
 
     file = st.file_uploader(label="Upload your PDF file here.", type=['pdf'])
 

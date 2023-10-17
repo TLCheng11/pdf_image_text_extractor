@@ -1,4 +1,3 @@
-#https://becominghuman.ai/how-to-automatically-deskew-straighten-a-text-image-using-opencv-a0c30aed83df
 import numpy as np
 import cv2
 
