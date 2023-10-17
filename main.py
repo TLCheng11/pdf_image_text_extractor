@@ -5,7 +5,6 @@ import image_helper as ih
 
 if __name__ == "__main__":
     st.set_page_config(page_title="PDF Text Extractor")
-    st.markdown('<link rel="stylesheet" type="text/css" href="/static/custom.css">', unsafe_allow_html=True)
 
     st.title("PDF Text Extractor")
 
