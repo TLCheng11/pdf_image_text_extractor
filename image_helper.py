@@ -42,11 +42,11 @@ def rotateImage(cvImage, angle: float):
     newImage = cv2.warpAffine(newImage, M, (w, h), flags=cv2.INTER_CUBIC, borderMode=cv2.BORDER_REPLICATE)
     return newImage
 
-# Deskew image
-def deskew(source_image):
-    # turn image into numpy array for cv2 to process
-    cvImage = np.array(source_image)
+def numpify_image(source_image):
+    return np.array(source_image)
 
+# Deskew image
+def deskew(cvImage):
     angle = getSkewAngle(cvImage)
     return rotateImage(cvImage, -1.0 * angle)
 

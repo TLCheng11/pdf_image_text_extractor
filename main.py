@@ -23,41 +23,62 @@ if __name__ == "__main__":
 
     st.set_page_config(page_title="PDF Text Extractor")
 
-    tab1, tab2 = st.tabs(["Text Extractor", "Translator"])
+    tab1, tab2, tab3 = st.tabs(["PDF Text Extractor", "Image Text Extractor", "Translator"])
 
+    # tab for PDF text extraction
     with tab1:
         st.title("PDF Text Extractor")
 
-        file = st.file_uploader(label="Upload your PDF file here.", type=['pdf'])
+        pdf_file = st.file_uploader(label="Upload your PDF file here.", type=['pdf'])
 
         language = st.selectbox(label="Please select the language you want to extract", options=["Chinese Simplified", "Chinese Traditional", "English"])
 
         fix = st.checkbox("Fix image orientation", value=True)
 
-        extract_btn_clicked = st.button(label="Extract Texts")
+        pdf_extract_btn_clicked = st.button(label="Extract Text from PDF")
 
-        if file is not None:
+        if pdf_file is not None:
             # Pass the file as BytesIO stream
-            pdf_data = io.BytesIO(file.read())
+            pdf_data = io.BytesIO(pdf_file.read())
             images = op.parse_file(pdf_data, fix)
 
             # Display images in a loop
             for i, img in enumerate(images):
                 st.subheader(f"Page {i + 1}")
+                np_img = ih.numpify_image(img)
+
                 col1, col2 = st.columns(2)
-                col1.image(img, use_column_width=True)
+                col1.image(np_img, use_column_width=True)
                 if str(i) in data:
                     col2.text_area("Text", data[str(i)], height=400)
                 else:
                     col2.empty()
-                if extract_btn_clicked:
-                    text = op.extract_text_from_image(img, language=language)
+                if pdf_extract_btn_clicked:
+                    text = op.extract_text_from_image(np_img, language=language)
                     col2.text_area("Text", text, height=400)
                     data[i] = text
 
             save_data(data)
 
+    # tab for Image text extraction
     with tab2:
+        st.title("Image Text Extractor")
+
+        image_file = st.file_uploader(label="Upload your PDF file here.", type=['jpg', 'jpeg', 'png'])
+
+        img_extract_btn_clicked = st.button(label="Extract Text from Image")
+
+        if image_file:
+            np_img = ih.numpify_image(image_file)
+            col1, col2 = st.columns(2)
+            col1.image(np_img, use_column_width=True)
+
+
+            if img_extract_btn_clicked:
+                text = op.extract_text_from_image()
+
+    # tab for translation
+    with tab3:
         st.title("GPT-translator")
 
         if not openai_key:

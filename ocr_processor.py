@@ -35,6 +35,7 @@ def parse_file(file, fix=True):
         image_list = page.get_pixmap(matrix=fitz.Matrix(300 / 72, 300 / 72))
 
         image = Image.frombytes("RGB", [image_list.width, image_list.height], image_list.samples)
+        image = ih.numpify_image(image)
         
         if fix:
             fixed_image = ih.deskew(image)
