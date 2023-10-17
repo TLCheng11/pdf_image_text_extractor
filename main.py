@@ -48,7 +48,7 @@ if __name__ == "__main__":
                 np_img = ih.numpify_image(img)
 
                 col1, col2 = st.columns(2)
-                col1.image(np_img, use_column_width=True)
+                col1.image(img, use_column_width=True)
                 if str(i) in data:
                     col2.text_area("Text", data[str(i)], height=400)
                 else:
@@ -64,15 +64,14 @@ if __name__ == "__main__":
     with tab2:
         st.title("Image Text Extractor")
 
-        image_file = st.file_uploader(label="Upload your PDF file here.", type=['jpg', 'jpeg', 'png'])
+        image_file = st.file_uploader(label="Upload your image here.", type=['jpg', 'jpeg', 'png'])
 
         img_extract_btn_clicked = st.button(label="Extract Text from Image")
 
-        if image_file:
+        if image_file is not None:
             np_img = ih.numpify_image(image_file)
             col1, col2 = st.columns(2)
-            col1.image(np_img, use_column_width=True)
-
+            col1.image(image_file, use_column_width=True)
 
             if img_extract_btn_clicked:
                 text = op.extract_text_from_image()
