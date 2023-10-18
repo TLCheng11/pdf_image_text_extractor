@@ -16,7 +16,7 @@ pip install -r requirements.txt
 echo '{"file_name": "", "current_page": 1}' > prev_extracted_text.json
 
 # Run the main.py script with Streamlit in viewer mode
-streamlit run main.py --client.toolbarMode viewer
+streamlit run main.py --client.toolbarMode viewer --server.port 8601
 
 # Deactivate the virtual environment
 deactivate

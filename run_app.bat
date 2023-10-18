@@ -16,7 +16,7 @@ rem Create an empty JSON object and overwrite the prev_extracted_text.json file
 echo {"file_name": "", "current_page": 1} > prev_extracted_text.json
 
 rem Run the main.py script
-streamlit run main.py --client.toolbarMode viewer
+streamlit run main.py --client.toolbarMode viewer --server.port 8601
 
 rem Close the Command Prompt window after completion
 exit

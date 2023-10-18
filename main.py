@@ -138,6 +138,13 @@ if __name__ == "__main__":
                         response, cb = lch.translate_text(img_target_language, img_text_area).values()
                         img_col2.write(response)
                         loading.empty()
+                        img_col2.divider()
+                        img_col2.caption(f"Request cost data:")
+                        img_col2.caption(f"input_char_count: {len(img_text_area)}")
+                        img_col2.caption(f"input_token_count: {cb.prompt_tokens}")
+                        img_col2.caption(f"output_char_count: {len(response)}")
+                        img_col2.caption(f"output_token_count: {cb.completion_tokens}")
+                        img_col2.caption(f"total_cost: ${cb.total_cost}")
             # else:
             #     img_col2.text("OpenAI API key is required for translating function.")
 
