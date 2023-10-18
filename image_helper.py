@@ -75,7 +75,6 @@ def thick_font(cvImage, size=1):
     kernel = np.ones((size,size), np.int8)
     image = cv2.dilate(image, kernel, iterations=1)
     image = cv2.bitwise_not(image)
-    cv2.imwrite(f"adjusted_image.jpg", image)
     return image
 
 # to save image

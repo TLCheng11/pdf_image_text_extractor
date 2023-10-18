@@ -21,7 +21,11 @@ if __name__ == "__main__":
     with open('prev_extracted_text.json', 'r') as file:
         data = json.load(file)
 
-    st.set_page_config(page_title="PDF Text Extractor")
+    st.set_page_config(
+        page_title="PDF Text Extractor",
+        page_icon="🧊",
+        layout="wide",
+    )
 
     tab1, tab2, tab3 = st.tabs(["PDF Text Extractor", "Image Text Extractor", "Translator"])
 
@@ -50,12 +54,12 @@ if __name__ == "__main__":
                 pdf_col1, pdf_col2 = st.columns(2)
                 pdf_col1.image(img, use_column_width=True)
                 if str(i) in data:
-                    pdf_col2.text_area("Text", data[str(i)], height=400)
+                    pdf_col2.text_area("Text", data[str(i)], height=500)
                 else:
                     pdf_col2.empty()
                 if pdf_extract_btn_clicked:
                     text = op.extract_text_from_image(image_np, language=pdf_language)
-                    pdf_col2.text_area("Text", text, height=400)
+                    pdf_col2.text_area("Text", text, height=500)
                     data[i] = text
 
             save_data(data)
@@ -73,10 +77,14 @@ if __name__ == "__main__":
         img_deskew = deskew_col1.checkbox("Fix image orientation", value=False)
         img_trun_90 = deskew_col2.checkbox("Turn image 90 degree", value=False)
 
-        # options for adjsut image contrast and brightness
+        # options for adjusting image contrast and brightness
         adj_col1, adj_col2 = st.columns(2)
         img_contrast = adj_col1.slider("Adjust contrast ratio:", 0.0, 2.0, (1.0))
         img_brightness = adj_col2.slider("Adjust brightness ratio:", -100.0, +100.0, (0.0))
+
+        # options for adjusting font thinkness
+        font_col1, _ = st.columns(2)
+        img_font = font_col1.slider("Adjust Font Weight:", 0, 5, (0))
 
         img_extract_btn_clicked = st.button(label="Extract Text from Image")
 
@@ -86,13 +94,15 @@ if __name__ == "__main__":
                 processed_img = ih.deskew(processed_img, turn_90=img_trun_90)
             if img_contrast != 1.0 or img_brightness != 0.0:
                 processed_img = ih.adj_contrast(processed_img, img_contrast, img_brightness)
+            if img_font != 0:
+                processed_img = ih.thick_font(processed_img, size=img_font)
                     
             img_col1, img_col2 = st.columns(2)
             img_col1.image(processed_img, use_column_width=True)
 
             if img_extract_btn_clicked:
                 text = op.extract_text_from_image(processed_img, language=img_language)
-                img_col2.text_area("Text", text, height=400)
+                img_col2.text_area("Text", text, height=500)
 
     # tab for translation
     with tab3:
