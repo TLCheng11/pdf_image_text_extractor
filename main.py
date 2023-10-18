@@ -11,20 +11,23 @@ import image_helper as ih
 import pdf_helper as pdf
 import langchain_helper as lch
 
-def save_data(data):
+data = {}
+
+def save_data():
     with open('prev_extracted_text.json', 'w') as file:
         json.dump(data, file)
 
-def reset_data():
+@st.cache_data
+def save_current_page_data(page, text):
+    data[str(page)] = text
     with open('prev_extracted_text.json', 'w') as file:
-        json.dump({"file_name": "", "current_page": 1}, file)
+        json.dump(data, file)
 
 if __name__ == "__main__":
     # load saved data and setup globle variables
     load_dotenv()
     openai_key = os.getenv("OPENAI_API_KEY")
 
-    data = {}
     with open('prev_extracted_text.json', 'r') as file:
         data = json.load(file)
 
@@ -71,9 +74,9 @@ if __name__ == "__main__":
 
         if image_file is not None:
             if data["file_name"] != image_file.name:
-                reset_data()
+                data = {"file_name": "", "current_page": 1}
                 data["file_name"] = image_file.name
-                save_data(data)
+                save_data()
 
             images = []
             pdf_extension_pattern = r".+\.pdf$"
@@ -108,11 +111,14 @@ if __name__ == "__main__":
                 img_extracted_text = op.extract_text_from_image(processed_img, language=img_language)
                 img_text_area = img_col2.text_area("Text", img_extracted_text, height=500)
                 data[str(current_page)] = img_text_area
-                save_data(data)
+                save_data()
 
             elif str(current_page) in data:
                 img_text_area = img_col2.text_area("Text", data[str(current_page)], height=500)
 
+            save_current_page_data(current_page, img_text_area)
+
+            # show translate box if openai api key present
             if openai_key:
                 if img_text_area:
                     translate_col1, translate_col2 = img_col2.columns([3,1])

@@ -36,7 +36,7 @@ def getSkewAngle(cvImage) -> float:
     largestContour = contours[0]
     # print (len(contours))
     minAreaRect = cv2.minAreaRect(largestContour)
-    cv2.imwrite("temp/boxes.jpg", newImage)
+    # cv2.imwrite("temp/boxes.jpg", newImage)
     # Determine the angle. Convert it to the value that was originally used to obtain skewed image
     angle = minAreaRect[-1]
     if angle < -45:
@@ -66,7 +66,6 @@ def deskew(cvImage, turn_90=False):
 # to adjust brightness and contrast
 def adj_contrast(cvImage, contrast, brightness):
     adjusted_image = cv2.convertScaleAbs(cvImage, alpha=contrast, beta=brightness)
-    cv2.imwrite(f"adjusted_image.jpg", adjusted_image)
     return adjusted_image
 
 # to make font bolder
@@ -86,8 +85,3 @@ def black_and_white(cvImage, darkness=200):
     _, thresholded = cv2.threshold(gray, darkness, 255, cv2.THRESH_BINARY)
 
     return thresholded
-
-# to save image
-def save_image(page_num, source_image):
-    fixed = deskew(source_image)
-    cv2.imwrite(f"rotated_fixed_{page_num}.jpg", fixed)
