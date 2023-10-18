@@ -82,11 +82,17 @@ if __name__ == "__main__":
         img_contrast = adj_col1.slider("Adjust contrast ratio:", 0.0, 2.0, (1.0))
         img_brightness = adj_col2.slider("Adjust brightness ratio:", -100.0, +100.0, (0.0))
 
-        # options for adjusting font thinkness
-        font_col1, _ = st.columns(2)
-        img_font = font_col1.slider("Adjust Font Weight:", 0, 5, (0))
+        # options for adjusting font thinkness and black and white image
+        _ , bnw_checkbox_col2 = st.columns(2)
+        img_bnw = bnw_checkbox_col2.checkbox("Turn image black and white (use this if text color is too light)", value=False)
 
-        img_extract_btn_clicked = st.button(label="Extract Text from Image")
+        font_col1, bnw_col2 = st.columns(2)
+        img_font = font_col1.slider("Adjust Font Weight:", 0, 5, (0))
+        img_darkness = bnw_col2.slider("Adjust darkness:", 0, 255, (240))
+
+        # columns for the btn to align right
+        _, btn_col2 = st.columns([4, 1])
+        img_extract_btn_clicked = btn_col2.button(label="Extract Text from Image")
 
         if image_file is not None:
             processed_img = ih.decode_img(image_file)
@@ -96,6 +102,8 @@ if __name__ == "__main__":
                 processed_img = ih.adj_contrast(processed_img, img_contrast, img_brightness)
             if img_font != 0:
                 processed_img = ih.thick_font(processed_img, size=img_font)
+            if img_bnw:
+                processed_img = ih.black_and_white(processed_img, darkness=img_darkness)
                     
             img_col1, img_col2 = st.columns(2)
             img_col1.image(processed_img, use_column_width=True)

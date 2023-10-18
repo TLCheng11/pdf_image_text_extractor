@@ -77,6 +77,16 @@ def thick_font(cvImage, size=1):
     image = cv2.bitwise_not(image)
     return image
 
+# to make image black & white
+def black_and_white(cvImage, darkness=200):
+    # Convert the image to grayscale for better text enhancement
+    gray = cv2.cvtColor(cvImage, cv2.COLOR_BGR2GRAY)
+
+    # Apply adaptive thresholding to enhance the text
+    _, thresholded = cv2.threshold(gray, darkness, 255, cv2.THRESH_BINARY)
+
+    return thresholded
+
 # to save image
 def save_image(page_num, source_image):
     fixed = deskew(source_image)
