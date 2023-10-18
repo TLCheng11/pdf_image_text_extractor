@@ -13,7 +13,12 @@ def save_data(data):
     with open('prev_extracted_text.json', 'w') as file:
         json.dump(data, file)
 
+def reset_data():
+    with open('prev_extracted_text.json', 'w') as file:
+        json.dump({"transfer": False, "current_page": 1}, file)
+
 if __name__ == "__main__":
+    # load saved data and setup globle variables
     load_dotenv()
     openai_key = os.getenv("OPENAI_API_KEY")
 
@@ -21,6 +26,10 @@ if __name__ == "__main__":
     with open('prev_extracted_text.json', 'r') as file:
         data = json.load(file)
 
+    img_extracted_text = None
+    transfer_text = False
+
+    # config main ui setting
     st.set_page_config(
         page_title="PDF Text Extractor",
         page_icon="🧊",
@@ -28,6 +37,7 @@ if __name__ == "__main__":
     )
 
     tab1, tab2, tab3 = st.tabs(["PDF Text Extractor", "Image Text Extractor", "Translator"])
+
 
     # tab for PDF text extraction
     with tab1:
@@ -91,11 +101,17 @@ if __name__ == "__main__":
         img_darkness = bnw_col2.slider("Adjust darkness:", 0, 255, (240))
 
         # columns for the btn to align right
-        _, btn_col2 = st.columns([4, 1])
-        img_extract_btn_clicked = btn_col2.button(label="Extract Text from Image")
+        page_selection_col, _, btn_col = st.columns([1, 3, 1])
+        img_extract_btn_clicked = btn_col.button(label="Extract Text from Image")
+
 
         if image_file is not None:
-            processed_img = ih.decode_img(image_file)
+            images = []
+            images.append(image_file)
+
+            current_page = page_selection_col.selectbox("Page", [i + 1 for i in range(len(images))], index=data["current_page"] - 1)
+
+            processed_img = ih.decode_img(images[current_page - 1])
             if img_deskew:
                 processed_img = ih.deskew(processed_img, turn_90=img_trun_90)
             if img_contrast != 1.0 or img_brightness != 0.0:
@@ -108,9 +124,19 @@ if __name__ == "__main__":
             img_col1, img_col2 = st.columns(2)
             img_col1.image(processed_img, use_column_width=True)
 
+            img_text_area = None
+
             if img_extract_btn_clicked:
-                text = op.extract_text_from_image(processed_img, language=img_language)
-                img_col2.text_area("Text", text, height=500)
+                img_extracted_text = op.extract_text_from_image(processed_img, language=img_language)
+                img_text_area = img_col2.text_area("Text", img_extracted_text, height=500)
+                data[current_page] = img_text_area
+                save_data(data)
+
+            elif str(current_page) in data:
+                img_text_area = img_col2.text_area("Text", data[str(current_page)], height=500)
+
+            if openai_key and img_text_area:
+                transfer_text = img_col2.button("Transfer text to Translator")
 
     # tab for translation
     with tab3:
@@ -124,6 +150,11 @@ if __name__ == "__main__":
                 max_chars=20,
                 value="English",
             )
+
+            # if transfer button was clicked, get the text from extracted text
+            text = ""
+            if transfer_text and img_extracted_text:
+                text = img_extracted_text
 
             source_text = st.text_area(
                 label="Enter source text here:",
