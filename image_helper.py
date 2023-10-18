@@ -56,9 +56,27 @@ def numpify_image(source_image):
     return np.array(source_image)
 
 # Deskew image
-def deskew(cvImage):
+def deskew(cvImage, turn_90=False):
     angle = getSkewAngle(cvImage)
-    return rotateImage(cvImage, -1.0 * angle)
+    if turn_90:
+        return rotateImage(cvImage, -1.0 * angle - 90)
+    else:
+        return rotateImage(cvImage, -1.0 * angle)
+
+# to adjust brightness and contrast
+def adj_contrast(cvImage, contrast, brightness):
+    adjusted_image = cv2.convertScaleAbs(cvImage, alpha=contrast, beta=brightness)
+    cv2.imwrite(f"adjusted_image.jpg", adjusted_image)
+    return adjusted_image
+
+# to make font bolder
+def thick_font(cvImage, size=1):
+    image = cv2.bitwise_not(cvImage)
+    kernel = np.ones((size,size), np.int8)
+    image = cv2.dilate(image, kernel, iterations=1)
+    image = cv2.bitwise_not(image)
+    cv2.imwrite(f"adjusted_image.jpg", image)
+    return image
 
 # to save image
 def save_image(page_num, source_image):
