@@ -26,9 +26,6 @@ if __name__ == "__main__":
     with open('prev_extracted_text.json', 'r') as file:
         data = json.load(file)
 
-    img_extracted_text = None
-    transfer_text = False
-
     # config main ui setting
     st.set_page_config(
         page_title="PDF Text Extractor",
@@ -129,14 +126,32 @@ if __name__ == "__main__":
             if img_extract_btn_clicked:
                 img_extracted_text = op.extract_text_from_image(processed_img, language=img_language)
                 img_text_area = img_col2.text_area("Text", img_extracted_text, height=500)
-                data[current_page] = img_text_area
+                data[str(current_page)] = img_text_area
                 save_data(data)
 
             elif str(current_page) in data:
                 img_text_area = img_col2.text_area("Text", data[str(current_page)], height=500)
 
             if openai_key and img_text_area:
-                transfer_text = img_col2.button("Transfer text to Translator")
+                translate_col1, translate_col2 = img_col2.columns([3,1])
+                img_target_language = translate_col1.text_input(
+                    label="Enter the language you want to translate into:",
+                    max_chars=20,
+                    value="English",
+                    key="img_target_language"
+                )
+                placeholder = translate_col2.subheader("")
+                translate_text = translate_col2.button("Translate Text")
+
+
+                if translate_text and img_text_area:
+                    loading = img_col2.empty()
+                    loading.text("Translating...")
+                    response, cb = lch.translate_text(img_target_language, img_text_area).values()
+                    img_col2.write(response)
+                    loading.empty()
+
+
 
     # tab for translation
     with tab3:
@@ -150,11 +165,6 @@ if __name__ == "__main__":
                 max_chars=20,
                 value="English",
             )
-
-            # if transfer button was clicked, get the text from extracted text
-            text = ""
-            if transfer_text and img_extracted_text:
-                text = img_extracted_text
 
             source_text = st.text_area(
                 label="Enter source text here:",
