@@ -73,13 +73,19 @@ if __name__ == "__main__":
         img_deskew = deskew_col1.checkbox("Fix image orientation", value=False)
         img_trun_90 = deskew_col2.checkbox("Turn image 90 degree", value=False)
 
+        # options for adjsut image contrast and brightness
+        adj_col1, adj_col2 = st.columns(2)
+        img_contrast = adj_col1.slider("Adjust contrast ratio:", 0.0, 2.0, (1.0))
+        img_brightness = adj_col2.slider("Adjust brightness ratio:", -100.0, +100.0, (0.0))
+
         img_extract_btn_clicked = st.button(label="Extract Text from Image")
 
         if image_file is not None:
-            img = ih.decode_img(image_file)
-            processed_img = img
+            processed_img = ih.decode_img(image_file)
             if img_deskew:
-                processed_img = ih.deskew(img, turn_90=img_trun_90)
+                processed_img = ih.deskew(processed_img, turn_90=img_trun_90)
+            if img_contrast != 1.0 or img_brightness != 0.0:
+                processed_img = ih.adj_contrast(processed_img, img_contrast, img_brightness)
                     
             img_col1, img_col2 = st.columns(2)
             img_col1.image(processed_img, use_column_width=True)
