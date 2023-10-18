@@ -1,7 +1,12 @@
+import os
 import pytesseract
+from dotenv import load_dotenv
+
+load_dotenv()
+tesseract_path = os.environ["TESSERACT_PATH"]
 
 # Path to the Tesseract executable (update this if necessary)
-pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract.exe'
+pytesseract.pytesseract.tesseract_cmd = tesseract_path
 
 languages = {
     "English": "eng",
