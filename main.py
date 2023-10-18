@@ -47,15 +47,15 @@ if __name__ == "__main__":
                 st.subheader(f"Page {i + 1}")
                 image_np = ih.numpify_image(img)
 
-                col1, col2 = st.columns(2)
-                col1.image(img, use_column_width=True)
+                pdf_col1, pdf_col2 = st.columns(2)
+                pdf_col1.image(img, use_column_width=True)
                 if str(i) in data:
-                    col2.text_area("Text", data[str(i)], height=400)
+                    pdf_col2.text_area("Text", data[str(i)], height=400)
                 else:
-                    col2.empty()
+                    pdf_col2.empty()
                 if pdf_extract_btn_clicked:
                     text = op.extract_text_from_image(image_np, language=pdf_language)
-                    col2.text_area("Text", text, height=400)
+                    pdf_col2.text_area("Text", text, height=400)
                     data[i] = text
 
             save_data(data)
@@ -68,17 +68,25 @@ if __name__ == "__main__":
 
         img_language = st.selectbox(label="Please select the language you want to extract", key="language_option_2", options=["Chinese Simplified", "Chinese Traditional", "English"])
 
+        # options for deskew image
+        deskew_col1, deskew_col2, _ = st.columns((1, 1, 1))
+        img_deskew = deskew_col1.checkbox("Fix image orientation", value=False)
+        img_trun_90 = deskew_col2.checkbox("Turn image 90 degree", value=False)
+
         img_extract_btn_clicked = st.button(label="Extract Text from Image")
 
         if image_file is not None:
             img = ih.decode_img(image_file)
-            processed_img = ih.deskew(img)
-            col1, col2 = st.columns(2)
-            col1.image(processed_img, use_column_width=True)
+            processed_img = img
+            if img_deskew:
+                processed_img = ih.deskew(img, turn_90=img_trun_90)
+                    
+            img_col1, img_col2 = st.columns(2)
+            img_col1.image(processed_img, use_column_width=True)
 
             if img_extract_btn_clicked:
                 text = op.extract_text_from_image(processed_img, language=img_language)
-                col2.text_area("Text", text, height=400)
+                img_col2.text_area("Text", text, height=400)
 
     # tab for translation
     with tab3:
