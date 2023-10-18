@@ -1,5 +1,6 @@
 import io
 import json
+import re
 import os
 import streamlit as st
 from dotenv import load_dotenv
@@ -7,6 +8,7 @@ from collections import defaultdict
 
 import ocr_processor as op
 import image_helper as ih
+import pdf_helper as pdf
 import langchain_helper as lch
 
 def save_data(data):
@@ -15,7 +17,7 @@ def save_data(data):
 
 def reset_data():
     with open('prev_extracted_text.json', 'w') as file:
-        json.dump({"transfer": False, "current_page": 1}, file)
+        json.dump({"file_name": "", "current_page": 1}, file)
 
 if __name__ == "__main__":
     # load saved data and setup globle variables
@@ -75,7 +77,7 @@ if __name__ == "__main__":
     with tab2:
         st.title("Image Text Extractor")
 
-        image_file = st.file_uploader(label="Upload your image here.", type=['jpg', 'jpeg', 'png'])
+        image_file = st.file_uploader(label="Upload your image here.", type=['jpg', 'jpeg', 'png', 'pdf'])
 
         img_language = st.selectbox(label="Please select the language you want to extract", key="language_option_2", options=["Chinese Simplified", "Chinese Traditional", "English"])
 
@@ -103,12 +105,26 @@ if __name__ == "__main__":
 
 
         if image_file is not None:
+            if data["file_name"] != image_file.name:
+                reset_data()
+                data["file_name"] = image_file.name
+                save_data(data)
+
             images = []
-            images.append(image_file)
+            pdf_extension_pattern = r".+\.pdf$"
+            if re.match(pdf_extension_pattern, image_file.name):
+                pdf_data = io.BytesIO(image_file.read())
+                images = pdf.parse_file(pdf_data)
+            else:
+                images.append(image_file)
 
             current_page = page_selection_col.selectbox("Page", [i + 1 for i in range(len(images))], index=data["current_page"] - 1)
 
-            processed_img = ih.decode_img(images[current_page - 1])
+            if re.match(pdf_extension_pattern, image_file.name):
+                processed_img = ih.numpify_image(images[current_page - 1])
+            else:
+                processed_img = ih.decode_img(images[current_page - 1])
+
             if img_deskew:
                 processed_img = ih.deskew(processed_img, turn_90=img_trun_90)
             if img_contrast != 1.0 or img_brightness != 0.0:
@@ -132,24 +148,27 @@ if __name__ == "__main__":
             elif str(current_page) in data:
                 img_text_area = img_col2.text_area("Text", data[str(current_page)], height=500)
 
-            if openai_key and img_text_area:
-                translate_col1, translate_col2 = img_col2.columns([3,1])
-                img_target_language = translate_col1.text_input(
-                    label="Enter the language you want to translate into:",
-                    max_chars=20,
-                    value="English",
-                    key="img_target_language"
-                )
-                placeholder = translate_col2.subheader("")
-                translate_text = translate_col2.button("Translate Text")
+            if openai_key:
+                if img_text_area:
+                    translate_col1, translate_col2 = img_col2.columns([3,1])
+                    img_target_language = translate_col1.text_input(
+                        label="Enter the language you want to translate into:",
+                        max_chars=20,
+                        value="English",
+                        key="img_target_language"
+                    )
+                    placeholder = translate_col2.subheader("")
+                    translate_text = translate_col2.button("Translate Text")
 
 
-                if translate_text and img_text_area:
-                    loading = img_col2.empty()
-                    loading.text("Translating...")
-                    response, cb = lch.translate_text(img_target_language, img_text_area).values()
-                    img_col2.write(response)
-                    loading.empty()
+                    if translate_text and img_text_area:
+                        loading = img_col2.empty()
+                        loading.text("Translating...")
+                        response, cb = lch.translate_text(img_target_language, img_text_area).values()
+                        img_col2.write(response)
+                        loading.empty()
+            # else:
+            #     img_col2.text("OpenAI API key is required for translating function.")
 
 
 
