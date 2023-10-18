@@ -35,46 +35,11 @@ if __name__ == "__main__":
         layout="wide",
     )
 
-    tab1, tab2, tab3 = st.tabs(["PDF Text Extractor", "Image Text Extractor", "Translator"])
+    tab1, tab2 = st.tabs(["Image and PDF Text Extractor", "Translator"])
 
-
-    # tab for PDF text extraction
-    with tab1:
-        st.title("PDF Text Extractor")
-
-        pdf_file = st.file_uploader(label="Upload your PDF file here.", type=['pdf'])
-
-        pdf_language = st.selectbox(label="Please select the language you want to extract", key="language_option_1", options=["Chinese Simplified", "Chinese Traditional", "English"])
-
-        fix = st.checkbox("Fix image orientation", value=True)
-
-        pdf_extract_btn_clicked = st.button(label="Extract Text from PDF")
-
-        if pdf_file is not None:
-            # Pass the file as BytesIO stream
-            pdf_data = io.BytesIO(pdf_file.read())
-            images = op.parse_file(pdf_data, fix)
-
-            # Display images in a loop
-            for i, img in enumerate(images):
-                st.subheader(f"Page {i + 1}")
-                image_np = ih.numpify_image(img)
-
-                pdf_col1, pdf_col2 = st.columns(2)
-                pdf_col1.image(img, use_column_width=True)
-                if str(i) in data:
-                    pdf_col2.text_area("Text", data[str(i)], height=500)
-                else:
-                    pdf_col2.empty()
-                if pdf_extract_btn_clicked:
-                    text = op.extract_text_from_image(image_np, language=pdf_language)
-                    pdf_col2.text_area("Text", text, height=500)
-                    data[i] = text
-
-            save_data(data)
 
     # tab for Image text extraction
-    with tab2:
+    with tab1:
         st.title("Image Text Extractor")
 
         image_file = st.file_uploader(label="Upload your image here.", type=['jpg', 'jpeg', 'png', 'pdf'])
@@ -173,7 +138,7 @@ if __name__ == "__main__":
 
 
     # tab for translation
-    with tab3:
+    with tab2:
         st.title("GPT-translator")
 
         if not openai_key:
