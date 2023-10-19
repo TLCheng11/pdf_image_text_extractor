@@ -121,6 +121,7 @@ if __name__ == "__main__":
             # show translate box if openai api key present
             if openai_key:
                 if img_text_area:
+                    img_col2.divider()
                     translate_col1, translate_col2 = img_col2.columns([3,1])
                     img_target_language = translate_col1.text_input(
                         label="Enter the language you want to translate into:",
@@ -131,11 +132,16 @@ if __name__ == "__main__":
                     placeholder = translate_col2.subheader("")
                     translate_text = translate_col2.button("Translate Text")
 
+                    img_rules = img_col2.text_area(
+                        label="Enter the rules you want the translator to follow:",
+                        max_chars=200,
+                        key="img_rules"
+                    )
 
                     if translate_text and img_text_area:
                         loading = img_col2.empty()
                         loading.text("Translating...")
-                        response, cb = lch.translate_text(img_target_language, img_text_area).values()
+                        response, cb = lch.translate_text(img_target_language, img_rules, img_text_area).values()
                         img_col2.write(response)
                         loading.empty()
                         img_col2.divider()
@@ -163,6 +169,11 @@ if __name__ == "__main__":
                 value="English",
             )
 
+            rules = st.text_area(
+                label="Enter the rules you want the translator to follow:",
+                max_chars=200,
+            )
+
             source_text = st.text_area(
                 label="Enter source text here:",
                 max_chars=2000,
@@ -177,7 +188,7 @@ if __name__ == "__main__":
             if clicked:
                 if source_text:
                     loading.text("Translating...")
-                    response, cb = lch.translate_text(target_language, source_text).values()
+                    response, cb = lch.translate_text(target_language, rules, source_text).values()
                     results.write(response)
                     loading.empty()
                     st.divider()
