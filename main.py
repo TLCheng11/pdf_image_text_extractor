@@ -1,5 +1,4 @@
 import io
-import json
 import re
 import os
 import streamlit as st
@@ -11,25 +10,24 @@ import image_helper as ih
 import pdf_helper as pdf
 import langchain_helper as lch
 
-data = {}
-
-def save_data():
-    with open('prev_extracted_text.json', 'w') as file:
-        json.dump(data, file)
-
 @st.cache_data
 def save_current_page_data(page, text):
-    data[str(page)] = text
-    with open('prev_extracted_text.json', 'w') as file:
-        json.dump(data, file)
+    st.session_state.data[str(page)] = text
 
 if __name__ == "__main__":
     # load saved data and setup globle variables
     load_dotenv()
     openai_key = os.getenv("OPENAI_API_KEY")
 
-    with open('prev_extracted_text.json', 'r') as file:
-        data = json.load(file)
+    # define variables to be save in session_state
+    if "file_name" not in st.session_state:
+        st.session_state.file_name = ""
+    
+    if "current_page" not in st.session_state:
+        st.session_state.current_page = 1
+
+    if "data" not in st.session_state:
+        st.session_state.data = {}
 
     # config main ui setting
     st.set_page_config(
@@ -73,10 +71,10 @@ if __name__ == "__main__":
 
 
         if image_file is not None:
-            if data["file_name"] != image_file.name:
-                data = {"file_name": "", "current_page": 1}
-                data["file_name"] = image_file.name
-                save_data()
+            if st.session_state.file_name != image_file.name:
+                st.session_state.file_name = image_file.name
+                st.session_state.current_page = 1
+                st.session_state.data = {}
 
             images = []
             pdf_extension_pattern = r".+\.pdf$"
@@ -86,12 +84,12 @@ if __name__ == "__main__":
             else:
                 images.append(image_file)
 
-            current_page = page_selection_col.selectbox("Page", [i + 1 for i in range(len(images))], index=data["current_page"] - 1)
+            page = page_selection_col.selectbox("Page", [i + 1 for i in range(len(images))], index=st.session_state.current_page - 1)
 
             if re.match(pdf_extension_pattern, image_file.name):
-                processed_img = ih.numpify_image(images[current_page - 1])
+                processed_img = ih.numpify_image(images[page - 1])
             else:
-                processed_img = ih.decode_img(images[current_page - 1])
+                processed_img = ih.decode_img(images[page - 1])
 
             if img_deskew:
                 processed_img = ih.deskew(processed_img, turn_90=img_trun_90)
@@ -110,13 +108,12 @@ if __name__ == "__main__":
             if img_extract_btn_clicked:
                 img_extracted_text = op.extract_text_from_image(processed_img, language=img_language)
                 img_text_area = img_col2.text_area("Text", img_extracted_text, height=500)
-                data[str(current_page)] = img_text_area
-                save_data()
+                st.session_state.data[str(page)] = img_text_area
 
-            elif str(current_page) in data:
-                img_text_area = img_col2.text_area("Text", data[str(current_page)], height=500)
+            elif str(page) in st.session_state.data:
+                img_text_area = img_col2.text_area("Text", st.session_state.data[str(page)], height=500)
 
-            save_current_page_data(current_page, img_text_area)
+            save_current_page_data(page, img_text_area)
 
             # show translate box if openai api key present
             if openai_key:
