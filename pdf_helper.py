@@ -1,7 +1,9 @@
 import fitz  # PyMuPDF
+import streamlit as st
 from PIL import Image
 
-def parse_file(file, fix=True):
+@st.cache_data
+def parse_file(file):
     doc = fitz.open(stream=file, filetype="pdf")
     images = []
 
