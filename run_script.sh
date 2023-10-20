@@ -12,9 +12,6 @@ source venv/bin/activate
 # Install packages from requirements.txt
 pip install -r requirements.txt
 
-# Create an empty JSON object and overwrite the prev_extracted_text.json file
-echo '{"file_name": "", "current_page": 1}' > prev_extracted_text.json
-
 # Run the main.py script with Streamlit in viewer mode
 streamlit run main.py --client.toolbarMode viewer --server.port 8601
 
