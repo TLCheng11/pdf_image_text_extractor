@@ -6,7 +6,7 @@ This is a Demo Vision using Tesseract for OCR and OpenAI API for text translatio
 
 The official version github repository is private.
 
-You can still visit here [wordextract.com](https://wordextract.com/) to try the offical application.
+You can visit [wordextract.com](https://wordextract.com/) to try the offical application.
 
 ## Features
 
