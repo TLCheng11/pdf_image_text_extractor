@@ -21,6 +21,7 @@ To get a local copy up and running follow these simple steps.
 
 -   Docker
 -   Python 3.9+ (if don't have Docker)
+-   [Tesseract OCR](https://github.com/tesseract-ocr/tesseract)
 
 ### Installation
 
