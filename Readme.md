@@ -28,7 +28,7 @@ To get a local copy up and running follow these simple steps.
 1.  Clone the repository
 
     ```sh
-    git clone https://github.com/yourusername/wordextract.git
+    git clone https://github.com/TLCheng11/pdf_image_text_extractor.git
     ```
 
 2.  Add the following api keys into a .env file
