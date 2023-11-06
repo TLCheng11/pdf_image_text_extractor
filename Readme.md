@@ -4,7 +4,7 @@ Welcome to WordExtract (Demo), a robust SaaS platform designed to provide OCR (O
 
 This is a Demo Vision using Tesseract for OCR and OpenAI API for text translation.
 
-The official version github repositerity is private.
+The official version github repository is private.
 
 You can still visit here [wordextract.com](https://wordextract.com/) to try the offical application.
 
@@ -52,3 +52,7 @@ To get a local copy up and running follow these simple steps.
 4.  Open app
 
     open app in [localhost:8601](http://localhost:8601)
+
+## License
+
+This project is licensed under the Apache License 2.0 - see the [LICENSE](LICENSE) file for details.
