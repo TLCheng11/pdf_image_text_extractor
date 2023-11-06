@@ -1,0 +1,13 @@
+version: "3"
+
+services:
+    streamlit:
+        build:
+            context: .
+            dockerfile: Dockerfile
+        command: bash -c "streamlit run main.py --client.toolbarMode viewer --server.port 8601"
+        # for development
+        # volumes:
+        #     - .:/home/worker/app
+        ports:
+            - "8701:8701"
